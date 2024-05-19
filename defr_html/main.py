@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup as bs
 import re
 
 # MAX_LENGTH = 4096
-MAX_LENGTH = 20
+MAX_LENGTH = 30
 
 CUR_LENGTH = 5717
 
@@ -19,6 +19,10 @@ def split_message(source: str, max_length: int =MAX_LENGTH) -> Generator[str, No
 
     # print(data.find('<a>'), '**********************************')
     data = '\n'.join(line for line in data.split('\n') if line.strip())
+
+
+
+
 
     # strong_tgs = (m.start() for m in re.finditer(r'<strong>', data))
 
@@ -56,8 +60,30 @@ def split_message2(source, max_length=MAX_LENGTH):
     with open(source, 'r') as file:
         data = file.read()
 
+    data = bs.endData(data, 'html.parser')
+
     for i in range(0, len(data), max_length):
         yield data[i:i + max_length]
+
+    # print(data)
+    # yield data
+
+def split_message3(source, max_length=MAX_LENGTH):
+    data = open(source)
+    data = bs(data, 'html.parser')
+    # print(data.name, '**********************************')
+    # print(data.p, '**********************************')
+    #
+    #
+    #
+    data = str(data)
+    # print(data.name, '**********************************')
+    for i in range(0, len(data), max_length):
+        # yield data[i:i + max_length]
+        fragment = data[i:i + max_length]
+        wrapped = f'<a>{fragment}</a>'
+        yield wrapped
+
 
     # print(data)
     # yield data
@@ -69,7 +95,8 @@ def split_message2(source, max_length=MAX_LENGTH):
 
 if __name__ == '__main__':
     # res2 = split_message2('input_files/source.html')
-    res2 = split_message2('input_files/sample.html')
+    # res2 = split_message2('input_files/sample.html')
+    res2 = split_message3('input_files/sample.html')
 
     for fragment in res2:
         print(fragment)
