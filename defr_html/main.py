@@ -1,11 +1,10 @@
 from typing import Generator
 from bs4 import BeautifulSoup as bs
-import re
-import click
+import re, os, click
 
 
 
-MAX_LENGTH = 4096
+MAX_LENGTH = 300
 # MAX_LENGTH = 5
 
 
@@ -56,8 +55,24 @@ def split_message(source: str, max_length=MAX_LENGTH) -> Generator[str, None, No
                 fragment_number += 1
 
 
+def get_next_filename(directory: str, base_name: str, extension: str) -> str:
+    """Returns the next available filename in the specified directory."""
+    index = 1
+    while True:
+        filename = '{}_{}{}'.format(base_name, index, extension)
+        if not os.path.exists(os.path.join(directory, filename)):
+            return filename
+        index += 1
+
+
 if __name__ == '__main__':
+    output_directory = 'output_files'
+    base_name = 'sample'
+    extension = '.html'
+
+    next_filename = get_next_filename(output_directory, base_name, extension)
+
     res2 = split_message('input_files/sample.html')
-    with open('output_files/sample.html', 'w', encoding='utf-8') as file:
+    with open(os.path.join(output_directory, next_filename), 'w', encoding='utf-8') as file:
         for part in res2:
             file.write(part + '\n')
