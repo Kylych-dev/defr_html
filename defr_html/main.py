@@ -5,76 +5,59 @@ import click
 
 
 
+MAX_LENGTH = 4096
+# MAX_LENGTH = 5
 
-
-# MAX_LENGTH = 4096
-MAX_LENGTH = 500
-
-CUR_LENGTH = 5717
-
-
-def split_message(source: str, max_length: int =MAX_LENGTH) -> Generator[str, None, None]:
-    """Splits the original message ('source') into fragments of 'max_length'."""
-    with open(source, 'r') as file:
-        data = file.read()
-
-
-    data = '\n'.join(line for line in data.split('\n') if line.strip())
-
-    for i in range(0, len(data), max_length):
-        yield data[i:i + max_length]
 
 
 # @click.command()
 # @click.option('--source', '-s', help='Path to the source file')
 # @click.argument('source', type=click.Path(exists=True))
-def split_message2(source, max_length=500):
+def split_message(source: str, max_length=MAX_LENGTH) -> Generator[str, None, None]:
+    """Splits the original message (`source`) into fragments of the specified length
+        (`max_len`)."""
     with open(source, 'r', encoding='utf-8') as file:
-        # data = file.read()
-        content = file.read()
-    # content = data.
+        html_content = file.read()
+        soup = bs(html_content, 'html5lib')
+        # html_content = soup.prettify()
 
-    for i in range(0, len(content), max_length):
-        yield content[i:i + max_length]
+        html_content = str(soup)
+
+        print(len(html_content))
+
+        liness = '-' * 50
+
+        fragment_number, current_length = 1, 0
+        fragments, tag_stack = [], []
+        current_fragment = ''
+
+        for char in html_content:
+            current_fragment += char
+            current_length += 1
+
+            if char == '<':
+                tag_stack.append(current_length)
+            elif char == '>':
+                tag_stack.pop()
+
+            if current_length >= max_length and not tag_stack:
+                fragments.append(current_fragment)
+                current_fragment = ''
+                current_length = 0
+                fragment_number += 1
+
+        if current_fragment:
+            fragments.append(current_fragment)
+
+        for i, fragment in enumerate(fragments):
+            yield fragment
+            if i < len(fragments) - 1:
+                yield f'{liness} fragment №{fragment_number}: {len(fragment)} chars {liness}'
+                fragment_number += 1
 
 
 if __name__ == '__main__':
-    res2 = split_message2('input_files/sample.html')
-    # res2 = split_message2()
-    for num, fragment in enumerate(res2, 1):
-        print(num, fragment)
-        print()
-        print('-' * 50)
-        print()
-
-
-
-
-
-
-
-
-'''
-import click 
-
-@click.command()
-@click.option('--name', '-n', default='Bob', help='First_name')
-def main(name):
-    print(f'Hello, {name}!')
-    
-if __name__ == '__main__':
-    main()
-
-
-
->>> python main.py --name Alice
-    ... Hello, Alice!
-
->>> python main.py --help
-Usage: main.py [OPTIONS]
-options:
-  -n, --name TEXT  First_name
-  --help       Show this message and exit.
-'''
-
-
+    res2 = split_message('input_files/sample.html')
+    with open('output_files/sample.html', 'w', encoding='utf-8') as file:
+        for part in res2:
+            file.write(part + '\n')
