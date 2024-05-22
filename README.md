@@ -18,5 +18,5 @@ python main.py input_files/sample.html --max-length 500
 6. `README.md` - файл с описанием проекта
 
 ### Контакты:
-- Email: [email](mailto:mirbekov1kylych@gmail.com
+- Email: [email](mailto:mirbekov1kylych@gmail.com)
 - Telegram: [telegram](https://t.me/kylych_mirbekov)
