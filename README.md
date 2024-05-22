@@ -1,8 +1,9 @@
 
 ### Для запуска программы необходимо выполнить следующие команды:
 ```bash
-poetry env use python3.12
-poetry install
+poetry env use python3.12     # create virtual env
+poetry install    # install dependencies
+poetry shell      # turn on virtual env 
 ```
 ```bash
 python main.py input_files/sample.html --max-length 500
